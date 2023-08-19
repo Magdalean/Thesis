@@ -31,6 +31,7 @@ from sklearn.metrics import (
     recall_score,
 )
 from transformers import AutoTokenizer
+from transformers import TFBertForNextSentencePrediction
 import tensorflow_privacy
 from tensorflow_privacy.privacy.analysis import compute_dp_sgd_privacy
 
