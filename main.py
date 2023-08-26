@@ -30,8 +30,7 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from transformers import AutoTokenizer
-from transformers import TFBertForNextSentencePrediction
+from transformers import AutoTokenizer, TFBertForNextSentencePrediction
 import tensorflow_privacy
 from tensorflow_privacy.privacy.analysis import compute_dp_sgd_privacy
 
@@ -98,7 +97,7 @@ def training(model_name, model, X_train, y_train, X_valid, y_valid, X_test):
     EPOCHS = 2
     BATCH_SIZE = 2  # changed from 28
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.000005)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.00005)
     model.compile(optimizer=optimizer, loss=loss, metrics="accuracy")
     model_history = model.fit(
         (X_train),
@@ -131,7 +130,7 @@ def training_priv(
     BATCH_SIZE = 2  # changed from 28
     l2_norm_clip = 1
     num_microbatches = 1
-    learning_rate = 0.000005  # changed from 0.25
+    learning_rate = 0.00005  # changed from 0.25, 0.000005 
     # loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     print("For noise multiplier = ", noise_multiplier)
 
@@ -319,17 +318,52 @@ y_train_bert2 = one_hot(y_train_bert2)
 y_valid_bert2 = one_hot(y_valid_bert2)
 y_test_bert2 = one_hot(y_test_bert2)
 
+# BERT BASE metrics
+acc_BERT, pre_BERT, rec_BERT, f1_BERT, auprc_BERT, auroc_BERT = training_BERT(
+    "bert-base-cased",
+    "BERT",
+    X_train_bert,
+    y_train_bert,
+    X_valid_bert,
+    y_valid_bert,
+    X_test_bert,
+    y_test_bert,
+)
 
-MODEL_NAME = "medicalai/ClinicalBERT"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+acc_BERTv2, pre_BERTv2, rec_BERTv2, f1_BERTv2, auprc_BERTv2, auroc_BERTv2 = training_BERT(
+    "bert-base-cased",
+    "BERTv2",
+    X_train_bert2,
+    y_train_bert2,
+    X_valid_bert2,
+    y_valid_bert2,
+    X_test_bert2,
+    y_test_bert2,
+)
 
-X_train_cbert, y_train_cbert = tokenize_dataset(tokenizer, CNN_dataset["train"])
-X_valid_cbert, y_valid_cbert = tokenize_dataset(tokenizer, CNN_dataset["valid"])
-X_test_cbert, y_test_cbert = tokenize_dataset(tokenizer, CNN_dataset["test"])
+metrics = ["Accuracy", "Precision", "Recall", "F1", "AUPRC", "AUROC"]
+Epsilon = ["Inf", "15", "5", "3", "0.5", "0.2", "0.02"]
 
-y_train_cbert = one_hot(y_train_cbert)
-y_valid_cbert = one_hot(y_valid_cbert)
-y_test_cbert = one_hot(y_test_cbert)
+results_path = "results"
+os.makedirs(os.path.dirname(results_path), exist_ok=True)
+
+metrics_df_BERT = pd.DataFrame(
+    list(zip(acc_BERT, pre_BERT, rec_BERT, f1_BERT, auprc_BERT, auroc_BERT)),
+    index=Epsilon,
+    columns=metrics,
+)
+metrics_df_BERT.to_csv("results/metrics_df_BERT.csv")
+metrics_df_BERTv2 = pd.DataFrame(
+    list(
+        zip(acc_BERTv2, pre_BERTv2, rec_BERTv2, f1_BERTv2, auprc_BERTv2, auroc_BERTv2)
+    ),
+    index=Epsilon,
+    columns=metrics,
+)
+metrics_df_BERTv2.to_csv("results/metrics_df_BERTv2.csv")
+
+print(metrics_df_BERT)
+print(metrics_df_BERTv2)
 
 # CLINICAL BERT
 MODEL_NAME = "medicalai/ClinicalBERT"
@@ -353,7 +387,7 @@ y_valid_cbert2 = one_hot(y_valid_cbert2)
 y_test_cbert2 = one_hot(y_test_cbert2)
 
 
-# BIO BERRT ---- might not be needed
+# BIO BERT 
 
 MODEL_NAME = "emilyalsentzer/Bio_ClinicalBERT"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -374,39 +408,10 @@ y_train_bc2 = one_hot(y_train_bc2)
 y_valid_bc2 = one_hot(y_valid_bc2)
 y_test_bc2 = one_hot(y_test_bc2)
 
-# BERT BASE
-acc_BERT, pre_BERT, rec_BERT, f1_BERT, auprc_BERT, auroc_BERT = training_BERT(
-    "bert-base-cased",
-    "BERT",
-    X_train_bert,
-    y_train_bert,
-    X_valid_bert,
-    y_valid_bert,
-    X_test_bert,
-    y_test_bert,
-)
-
-(
-    acc_BERTv2,
-    pre_BERTv2,
-    rec_BERTv2,
-    f1_BERTv2,
-    auprc_BERTv2,
-    auroc_BERTv2,
-) = training_BERT(
-    "bert-base-cased",
-    "BERTv2",
-    X_train_bert2,
-    y_train_bert2,
-    X_valid_bert2,
-    y_valid_bert2,
-    X_test_bert2,
-    y_test_bert2,
-)
 
 # CLINICAL BERT
 acc_cBERT, pre_cBERT, rec_cBERT, f1_cBERT, auprc_cBERT, auroc_cBERT = training_BERT(
-    "bert-base-cased",
+    "medicalai/ClinicalBERT",
     "ClinicalBERT",
     X_train_cbert,
     y_train_cbert,
@@ -416,15 +421,8 @@ acc_cBERT, pre_cBERT, rec_cBERT, f1_cBERT, auprc_cBERT, auroc_cBERT = training_B
     y_test_cbert,
 )
 
-(
-    acc_cBERTv2,
-    pre_cBERTv2,
-    rec_cBERTv2,
-    f1_cBERTv2,
-    auprc_cBERTv2,
-    auroc_cBERTv2,
-) = training_BERT(
-    "bert-base-cased",
+acc_cBERTv2, pre_cBERTv2, rec_cBERTv2, f1_cBERTv2, auprc_cBERTv2, auroc_cBERTv2m= training_BERT(
+    "medicalai/ClinicalBERT",
     "ClinicalBERTv2",
     X_train_cbert2,
     y_train_cbert2,
@@ -433,67 +431,6 @@ acc_cBERT, pre_cBERT, rec_cBERT, f1_cBERT, auprc_cBERT, auroc_cBERT = training_B
     X_test_cbert2,
     y_test_cbert2,
 )
-
-# BIO BERT -- might not be needed
-
-(
-    acc_bcBERT,
-    pre_bcBERT,
-    rec_bcBERT,
-    f1_bcBERT,
-    auprc_bcBERT,
-    auroc_bcBERT,
-) = training_BERT(
-    "bert-base-cased",
-    "ClinicalBioBERT",
-    X_train_bc,
-    y_train_bc,
-    X_valid_bc,
-    y_valid_bc,
-    X_test_bc,
-    y_test_bc,
-)
-
-(
-    acc_bcBERTv2,
-    pre_bcBERTv2,
-    rec_bcBERTv2,
-    f1_bcBERTv2,
-    auprc_bcBERTv2,
-    auroc_bcBERTv2,
-) = training_BERT(
-    "bert-base-cased",
-    "ClinicalBioBERTv2",
-    X_train_bc2,
-    y_train_bc2,
-    X_valid_bc2,
-    y_valid_bc2,
-    X_test_bc2,
-    y_test_bc2,
-)
-
-
-metrics = ["Accuracy", "Precision", "Recall", "F1", "AUPRC", "AUROC"]
-Epsilon = ["Inf", "15", "5", "3", "0.5", "0.2", "0.02"]
-
-results_path = "results"
-os.makedirs(os.path.dirname(results_path), exist_ok=True)
-
-metrics_df_BERT = pd.DataFrame(
-    list(zip(acc_BERT, pre_BERT, rec_BERT, f1_BERT, auprc_BERT, auroc_BERT)),
-    index=Epsilon,
-    columns=metrics,
-)
-metrics_df_BERT.to_csv("results/metrics_df_BERT.csv")
-metrics_df_BERTv2 = pd.DataFrame(
-    list(
-        zip(acc_BERTv2, pre_BERTv2, rec_BERTv2, f1_BERTv2, auprc_BERTv2, auroc_BERTv2)
-    ),
-    index=Epsilon,
-    columns=metrics,
-)
-metrics_df_BERTv2.to_csv("results/metrics_df_BERTv2.csv")
-
 
 metrics_df_cBERT = pd.DataFrame(
     list(zip(acc_cBERT, pre_cBERT, rec_cBERT, f1_cBERT, auprc_cBERT, auroc_cBERT)),
@@ -516,6 +453,33 @@ metrics_df_cBERTv2 = pd.DataFrame(
     columns=metrics,
 )
 metrics_df_cBERTv2.to_csv("results/metrics_df_cBERTv2.csv")
+
+print(metrics_df_cBERT)
+print(metrics_df_cBERTv2)
+
+# BIO BERT
+
+acc_bcBERT, pre_bcBERT, rec_bcBERT, f1_bcBERT, auprc_bcBERT, auroc_bcBERT = training_BERT(
+    "emilyalsentzer/Bio_ClinicalBERT",
+    "ClinicalBioBERT",
+    X_train_bc,
+    y_train_bc,
+    X_valid_bc,
+    y_valid_bc,
+    X_test_bc,
+    y_test_bc,
+)
+
+acc_bcBERTv2, pre_bcBERTv2, rec_bcBERTv2, f1_bcBERTv2, auprc_bcBERTv2, auroc_bcBERTv2 = training_BERT(
+    "emilyalsentzer/Bio_ClinicalBERT",
+    "ClinicalBioBERTv2",
+    X_train_bc2,
+    y_train_bc2,
+    X_valid_bc2,
+    y_valid_bc2,
+    X_test_bc2,
+    y_test_bc2,
+)
 
 metrics_df_bcBERT = pd.DataFrame(
     list(
@@ -541,9 +505,5 @@ metrics_df_bcBERTv2 = pd.DataFrame(
 )
 metrics_df_bcBERTv2.to_csv("results/metrics_df_bcBERTv2.csv")
 
-print(metrics_df_BERT)
-print(metrics_df_BERTv2)
-print(metrics_df_cBERT)
-print(metrics_df_cBERTv2)
 print(metrics_df_bcBERT)
 print(metrics_df_bcBERTv2)
