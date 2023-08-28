@@ -338,7 +338,7 @@ metrics = ["Accuracy", "Precision", "Recall", "F1", "AUPRC", "AUROC"]
 Epsilon = ["Inf", "15", "5", "3", "0.5", "0.2", "0.02"]
 
 results_path = "results"
-os.makedirs(os.path.dirname(results_path), exist_ok=True)
+# os.makedirs(os.path.dirname(results_path), exist_ok=True)
 
 # metrics_df_BERT = pd.DataFrame(
 #     list(zip(acc_BERT, pre_BERT, rec_BERT, f1_BERT, auprc_BERT, auroc_BERT)),
@@ -393,13 +393,13 @@ y_train_bc = one_hot(y_train_bc)
 y_valid_bc = one_hot(y_valid_bc)
 y_test_bc = one_hot(y_test_bc)
 
-X_train_bc2, y_train_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["train"])
-X_valid_bc2, y_valid_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["valid"])
-X_test_bc2, y_test_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["test"])
+# X_train_bc2, y_train_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["train"])
+# X_valid_bc2, y_valid_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["valid"])
+# X_test_bc2, y_test_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["test"])
 
-y_train_bc2 = one_hot(y_train_bc2)
-y_valid_bc2 = one_hot(y_valid_bc2)
-y_test_bc2 = one_hot(y_test_bc2)
+# y_train_bc2 = one_hot(y_train_bc2)
+# y_valid_bc2 = one_hot(y_valid_bc2)
+# y_test_bc2 = one_hot(y_test_bc2)
 
 
 # # CLINICAL BERT
@@ -463,17 +463,17 @@ acc_bcBERT, pre_bcBERT, rec_bcBERT, f1_bcBERT, auprc_bcBERT, auroc_bcBERT = trai
     y_test_bc,
 )
 
-print("Finetuning BioClinical BERT-2")
-acc_bcBERTv2, pre_bcBERTv2, rec_bcBERTv2, f1_bcBERTv2, auprc_bcBERTv2, auroc_bcBERTv2 = training_BERT(
-    "emilyalsentzer/Bio_ClinicalBERT",
-    "ClinicalBioBERTv2",
-    X_train_bc2,
-    y_train_bc2,
-    X_valid_bc2,
-    y_valid_bc2,
-    X_test_bc2,
-    y_test_bc2,
-)
+# print("Finetuning BioClinical BERT-2")
+# acc_bcBERTv2, pre_bcBERTv2, rec_bcBERTv2, f1_bcBERTv2, auprc_bcBERTv2, auroc_bcBERTv2 = training_BERT(
+#     "emilyalsentzer/Bio_ClinicalBERT",
+#     "ClinicalBioBERTv2",
+#     X_train_bc2,
+#     y_train_bc2,
+#     X_valid_bc2,
+#     y_valid_bc2,
+#     X_test_bc2,
+#     y_test_bc2,
+# )
 
 print("Creating BioClinical BERT dataframes")
 metrics_df_bcBERT = pd.DataFrame(
@@ -484,21 +484,21 @@ metrics_df_bcBERT = pd.DataFrame(
     columns=metrics,
 )
 metrics_df_bcBERT.to_csv("results/metrics_df_bcBERT.csv")
-metrics_df_bcBERTv2 = pd.DataFrame(
-    list(
-        zip(
-            acc_bcBERTv2,
-            pre_bcBERTv2,
-            rec_bcBERTv2,
-            f1_bcBERTv2,
-            auprc_bcBERTv2,
-            auroc_bcBERTv2,
-        )
-    ),
-    index=Epsilon,
-    columns=metrics,
-)
-metrics_df_bcBERTv2.to_csv("results/metrics_df_bcBERTv2.csv")
+# metrics_df_bcBERTv2 = pd.DataFrame(
+#     list(
+#         zip(
+#             acc_bcBERTv2,
+#             pre_bcBERTv2,
+#             rec_bcBERTv2,
+#             f1_bcBERTv2,
+#             auprc_bcBERTv2,
+#             auroc_bcBERTv2,
+#         )
+#     ),
+#     index=Epsilon,
+#     columns=metrics,
+# )
+# metrics_df_bcBERTv2.to_csv("results/metrics_df_bcBERTv2.csv")
 
 print(metrics_df_bcBERT)
-print(metrics_df_bcBERTv2)
+# print(metrics_df_bcBERTv2)
