@@ -334,11 +334,11 @@ def training_BERT(
 #     y_test_bert2,
 # )
 
-# metrics = ["Accuracy", "Precision", "Recall", "F1", "AUPRC", "AUROC"]
-# Epsilon = ["Inf", "15", "5", "3", "0.5", "0.2", "0.02"]
+metrics = ["Accuracy", "Precision", "Recall", "F1", "AUPRC", "AUROC"]
+Epsilon = ["Inf", "15", "5", "3", "0.5", "0.2", "0.02"]
 
-# results_path = "results"
-# os.makedirs(os.path.dirname(results_path), exist_ok=True)
+results_path = "results"
+os.makedirs(os.path.dirname(results_path), exist_ok=True)
 
 # metrics_df_BERT = pd.DataFrame(
 #     list(zip(acc_BERT, pre_BERT, rec_BERT, f1_BERT, auprc_BERT, auroc_BERT)),
@@ -380,26 +380,26 @@ def training_BERT(
 # y_test_cbert2 = one_hot(y_test_cbert2)
 
 
-# # BIO BERT 
+# BIOCLINICAL BERT 
 
-# MODEL_NAME = "emilyalsentzer/Bio_ClinicalBERT"
-# tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+MODEL_NAME = "emilyalsentzer/Bio_ClinicalBERT"
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-# X_train_bc, y_train_bc = tokenize_dataset(tokenizer, CNN_dataset["train"])
-# X_valid_bc, y_valid_bc = tokenize_dataset(tokenizer, CNN_dataset["valid"])
-# X_test_bc, y_test_bc = tokenize_dataset(tokenizer, CNN_dataset["test"])
+X_train_bc, y_train_bc = tokenize_dataset(tokenizer, CNN_dataset["train"])
+X_valid_bc, y_valid_bc = tokenize_dataset(tokenizer, CNN_dataset["valid"])
+X_test_bc, y_test_bc = tokenize_dataset(tokenizer, CNN_dataset["test"])
 
-# y_train_bc = one_hot(y_train_bc)
-# y_valid_bc = one_hot(y_valid_bc)
-# y_test_bc = one_hot(y_test_bc)
+y_train_bc = one_hot(y_train_bc)
+y_valid_bc = one_hot(y_valid_bc)
+y_test_bc = one_hot(y_test_bc)
 
-# X_train_bc2, y_train_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["train"])
-# X_valid_bc2, y_valid_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["valid"])
-# X_test_bc2, y_test_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["test"])
+X_train_bc2, y_train_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["train"])
+X_valid_bc2, y_valid_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["valid"])
+X_test_bc2, y_test_bc2 = tokenize_dataset(tokenizer, CNN_dataset2["test"])
 
-# y_train_bc2 = one_hot(y_train_bc2)
-# y_valid_bc2 = one_hot(y_valid_bc2)
-# y_test_bc2 = one_hot(y_test_bc2)
+y_train_bc2 = one_hot(y_train_bc2)
+y_valid_bc2 = one_hot(y_valid_bc2)
+y_test_bc2 = one_hot(y_test_bc2)
 
 
 # # CLINICAL BERT
@@ -450,7 +450,7 @@ def training_BERT(
 # print(metrics_df_cBERT)
 # print(metrics_df_cBERTv2)
 
-# BIO BERT
+# BIOCLINICAL BERT
 
 acc_bcBERT, pre_bcBERT, rec_bcBERT, f1_bcBERT, auprc_bcBERT, auroc_bcBERT = training_BERT(
     "emilyalsentzer/Bio_ClinicalBERT",
