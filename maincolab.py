@@ -34,7 +34,7 @@ from transformers import AutoTokenizer, TFBertForNextSentencePrediction
 import tensorflow_privacy
 from tensorflow_privacy.privacy.analysis import compute_dp_sgd_privacy
 
-
+print("Import complete")
 def create_dataset(loaded_CNN, bagdf):
     text = loaded_CNN["article"].values.tolist()
     bag_list = bagdf.values.tolist()
@@ -214,7 +214,7 @@ def one_hot(arr):
 
 
 seg = pysbd.Segmenter(language="en", clean=False)
-
+print("reading CNN data files")
 loaded_CNN1 = pd.read_csv("data/CNN_20K_1.csv")
 loaded_CNN2 = pd.read_csv("data/CNN_20K_2.csv")
 
@@ -223,7 +223,7 @@ bagdf2 = pd.read_csv("data/bag20k-2.csv", index_col=0)
 CNN_dataset = create_dataset(loaded_CNN1, bagdf1)
 CNN_dataset2 = create_dataset(loaded_CNN2, bagdf2)
 
-
+print("CNN datasets created")
 def training_BERT(
     MODEL_NAME, label, X_train, y_train, X_valid, y_valid, X_test, y_test
 ):
@@ -333,7 +333,7 @@ def training_BERT(
 #     X_test_bert2,
 #     y_test_bert2,
 # )
-
+print("creating results folder and output file path")
 metrics = ["Accuracy", "Precision", "Recall", "F1", "AUPRC", "AUROC"]
 Epsilon = ["Inf", "15", "5", "3", "0.5", "0.2", "0.02"]
 
@@ -381,7 +381,7 @@ os.makedirs(os.path.dirname(results_path), exist_ok=True)
 
 
 # BIOCLINICAL BERT 
-
+print("loading BioClinical BERT")
 MODEL_NAME = "emilyalsentzer/Bio_ClinicalBERT"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
@@ -451,7 +451,7 @@ y_test_bc2 = one_hot(y_test_bc2)
 # print(metrics_df_cBERTv2)
 
 # BIOCLINICAL BERT
-
+print("Finetuning BioClinical BERT")
 acc_bcBERT, pre_bcBERT, rec_bcBERT, f1_bcBERT, auprc_bcBERT, auroc_bcBERT = training_BERT(
     "emilyalsentzer/Bio_ClinicalBERT",
     "ClinicalBioBERT",
@@ -463,6 +463,7 @@ acc_bcBERT, pre_bcBERT, rec_bcBERT, f1_bcBERT, auprc_bcBERT, auroc_bcBERT = trai
     y_test_bc,
 )
 
+print("Finetuning BioClinical BERT-2")
 acc_bcBERTv2, pre_bcBERTv2, rec_bcBERTv2, f1_bcBERTv2, auprc_bcBERTv2, auroc_bcBERTv2 = training_BERT(
     "emilyalsentzer/Bio_ClinicalBERT",
     "ClinicalBioBERTv2",
@@ -474,6 +475,7 @@ acc_bcBERTv2, pre_bcBERTv2, rec_bcBERTv2, f1_bcBERTv2, auprc_bcBERTv2, auroc_bcB
     y_test_bc2,
 )
 
+print("Creating BioClinical BERT dataframes")
 metrics_df_bcBERT = pd.DataFrame(
     list(
         zip(acc_bcBERT, pre_bcBERT, rec_bcBERT, f1_bcBERT, auprc_bcBERT, auroc_bcBERT)
