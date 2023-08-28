@@ -5,4 +5,4 @@ tensorflow==2.11.0
 pandas==1.5.3
 pysbd==0.3.4
 numpy==1.23.5
-tensorflow_privacy==0.8.10
+tensorflow_privacy==0.19.0
